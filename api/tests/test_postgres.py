@@ -97,7 +97,7 @@ class PostgresTests(unittest.TestCase):
             self.assertEqual(client.post('/v1/models/10000002/predict',headers=headers,json=payload).status_code,403)
 
     def test_08_limited_application_role(self):
-        self.query('CREATE ROLE automind_app LOGIN')
+        self.query('CREATE ROLE storeml_app LOGIN')
         self.query('INSERT INTO permisos (email,modelo_id) VALUES (:email,10000001)',email='reservado@gmail.com')
         raw=self.engine.raw_connection()
         try:
@@ -105,7 +105,7 @@ class PostgresTests(unittest.TestCase):
             cur.execute('SELECT current_database()');name=cur.fetchone()[0]
             self.assertTrue(name.replace('_','').isalnum())
             cur.execute((ROOT/'sql/03-privilegios-app.sql').read_text('utf-8').replace('ON DATABASE storeml_database',f'ON DATABASE "{name}"'))
-            cur.execute('SET ROLE automind_app');cur.close()
+            cur.execute('SET ROLE storeml_app');cur.close()
         finally:
             raw.driver_connection.autocommit=False
             raw.close()
