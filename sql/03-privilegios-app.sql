@@ -9,7 +9,7 @@ END $$;
 ALTER ROLE automind_app NOCREATEDB NOCREATEROLE;
 REVOKE CREATE ON SCHEMA public FROM PUBLIC;
 REVOKE ALL ON ALL TABLES IN SCHEMA public FROM automind_app;
-GRANT CONNECT ON DATABASE automind TO automind_app;
+GRANT CONNECT ON DATABASE storeml_database TO automind_app;
 GRANT USAGE ON SCHEMA public TO automind_app;
 GRANT SELECT ON public.usuarios, public.modelos, public.permisos, public.solicitudes TO automind_app;
 GRANT INSERT ON public.usuarios, public.solicitudes TO automind_app;
