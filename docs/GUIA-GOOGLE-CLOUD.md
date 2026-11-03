@@ -51,11 +51,11 @@ Cloud SQL tiene cargos de instancia, capacidad y almacenamiento aunque la app no
 
 ## 4. Crear la base y las cuatro tablas
 
-Dentro de la instancia abre Bases de datos > Crear base de datos. Escribe storeml_database y confirma. En Usuarios > Agregar cuenta crea el usuario de base de datos automind_app con una contraseña diferente a postgres. Guárdala: se almacenará como secreto en el paso 5.
+Dentro de la instancia abre Bases de datos > Crear base de datos. Escribe storeml_database y confirma. En Usuarios > Agregar cuenta crea el usuario de base de datos storeml_app con una contraseña diferente a postgres. Guárdala: se almacenará como secreto en el paso 5.
 
 Abre Cloud SQL Studio en el menú de la instancia. Selecciona autenticación integrada de base de datos (Built-in), base storeml_database, usuario postgres y su contraseña. Elige Nueva consulta. Abre localmente sql/01-esquema.sql, copia todo su contenido al editor y pulsa Ejecutar. Después ejecuta de la misma forma sql/02-catalogo-y-accesos.sql y, por último, sql/03-privilegios-app.sql.
 
-El primer archivo crea las cuatro tablas con claves foráneas y restricciones. El segundo carga las 24 fichas con sus rutas y 12 permisos reservados para tu Gmail. No crea un usuario Google ficticio. El tercero limita automind_app: puede registrar identidades verificadas, gestionar solicitudes y cuota, pero no otorgar permisos ni editar el catálogo. No uses postgres como usuario de la API.
+El primer archivo crea las cuatro tablas con claves foráneas y restricciones. El segundo carga las 24 fichas con sus rutas y 12 permisos reservados para tu Gmail. No crea un usuario Google ficticio. El tercero limita storeml_app: puede registrar identidades verificadas, gestionar solicitudes y cuota, pero no otorgar permisos ni editar el catálogo. No uses postgres como usuario de la API.
 
 El tercer archivo retira la membresía cloudsqlsuperuser que Cloud SQL puede conceder al crear usuarios integrados. También quita privilegios de creación de bases/roles y asigna los permisos SQL concretos de la aplicación. Ejecútalo antes de desplegar la API.
 
@@ -72,7 +72,7 @@ Deben aparecer modelos, permisos, solicitudes y usuarios. El contador de cuota s
 
 ## 5. Guardar la contraseña y preparar la conexión
 
-Abre Secret Manager > Crear secreto. Nombre: automind-db-password. Como valor escribe únicamente la contraseña de automind_app, sin comillas y sin salto de línea adicional. Guarda el secreto y anota la versión, por ejemplo 1.
+Abre Secret Manager > Crear secreto. Nombre: automind-db-password. Como valor escribe únicamente la contraseña de storeml_app, sin comillas y sin salto de línea adicional. Guarda el secreto y anota la versión, por ejemplo 1.
 
 En los permisos de ese secreto agrega el email completo de storeml-api@TU_PROYECTO.iam.gserviceaccount.com y el rol Secret Manager Secret Accessor (roles/secretmanager.secretAccessor). Limita el acceso al secreto necesario; el motor de calculadoras no necesita esta contraseña.
 
@@ -81,7 +81,7 @@ La API utiliza estas variables públicas de configuración y un secreto:
 ```text
 INSTANCE_CONNECTION_NAME = PROYECTO:REGIÓN:storeml-pg
 DB_NAME                  = storeml_database
-DB_USER                  = automind_app
+DB_USER                  = storeml_app
 GOOGLE_WEB_CLIENT_ID     = cliente Web OAuth real
 INFERENCE_URL            = URL HTTPS del motor privado
 DB_PASSWORD              = referencia al secreto, versión 1
@@ -175,7 +175,7 @@ DB_PASSWORD_SECRET_VERSION  1
 
 Las últimas cuatro tienen los valores predeterminados mostrados si las omites. Aun así, conviene definirlas explícitamente. Si tu secreto tiene otra versión numérica, usa esa versión. No uses latest ni pegues la contraseña SQL como variable o secreto de GitHub.
 
-Los servicios y usuarios tienen nombres fijos: automind-api, automind-inference, DB_NAME=storeml_database, DB_USER=automind_app. Las cuentas de ejecución son storeml-api@PROYECTO.iam.gserviceaccount.com y storeml-inference@PROYECTO.iam.gserviceaccount.com. El validador exige que la instancia SQL y la cuenta de despliegue pertenezcan a GCP_PROJECT_ID.
+Los servicios y usuarios tienen nombres fijos: automind-api, automind-inference, DB_NAME=storeml_database, DB_USER=storeml_app. Las cuentas de ejecución son storeml-api@PROYECTO.iam.gserviceaccount.com y storeml-inference@PROYECTO.iam.gserviceaccount.com. El validador exige que la instancia SQL y la cuenta de despliegue pertenezcan a GCP_PROJECT_ID.
 
 La contraseña permanece en Secret Manager según el paso 5. La API necesita acceso a ese secreto; GitHub solo pasa la referencia al configurar Cloud Run. Actions solicita un token Google temporal por OIDC después de compilar las imágenes; no requiere descargar una clave JSON.
 ---
@@ -278,7 +278,7 @@ Los permisos adicionales pueden reservarse por Gmail con usuario_id NULL y vincu
 
 En Cloud SQL > Copias de seguridad puedes crear un respaldo manual antes de cambios. Para volver atrás en código utiliza las revisiones de Cloud Run; una revisión anterior no deshace cambios SQL. En esta entrega no se borran tablas ni se eliminan tus recursos de nube.
 
-Para rotar la contraseña, cambia automind_app en Cloud SQL, añade una versión del secreto, actualiza DB_PASSWORD_SECRET_VERSION en las variables de GitHub y ejecuta el workflow. No cambies solo la revisión desde la consola: el siguiente push vuelve a aplicar las variables de GitHub. Coordina la rotación para evitar cortes.
+Para rotar la contraseña, cambia storeml_app en Cloud SQL, añade una versión del secreto, actualiza DB_PASSWORD_SECRET_VERSION en las variables de GitHub y ejecuta el workflow. No cambies solo la revisión desde la consola: el siguiente push vuelve a aplicar las variables de GitHub. Coordina la rotación para evitar cortes.
 
 iOS requiere un Mac con Xcode. Desde mobile ejecuta npm ci, bundle install y, dentro de ios, bundle exec pod install. Abre AutoMind.xcworkspace, configura Team, firma, bundle ID com.automind, cliente iOS y URL scheme del paso 6. Ejecuta o archiva desde Xcode. No se ha compilado iOS en este entorno Windows.
 ---
@@ -304,7 +304,7 @@ sql/01-esquema.sql: cuatro tablas, claves foráneas, IDs de ocho dígitos, estad
 
 sql/02-catalogo-y-accesos.sql: 24 modelos con ruta archivo y tus 12 permisos. Conserva cambios previos al repetirlo.
 
-sql/03-privilegios-app.sql: rol limitado automind_app. El backend no puede conceder acceso ni modificar los modelos.
+sql/03-privilegios-app.sql: rol limitado storeml_app. El backend no puede conceder acceso ni modificar los modelos.
 
 inference/modelos/AREA/MODELO.py: las 24 sumas independientes, con MODEL_ID numérico. inference/registry.py: relación fija entre ID y módulo permitido.
 
