@@ -36,7 +36,7 @@ if __name__=='__main__':
             url=os.getenv('INFERENCE_URL','')
             if not re.fullmatch(r'https://[a-z0-9-]+\.[a-z0-9.-]+',url):
                 raise ValueError('La URL desplegada del motor no es HTTPS válida')
-            config=dict(APP_ENV='production',DB_NAME='storeml_database',DB_USER='automind_app',
+            config=dict(APP_ENV='production',DB_NAME='storeml_database',DB_USER='storeml_app',
                 INSTANCE_CONNECTION_NAME=values['INSTANCE_CONNECTION_NAME'],
                 GOOGLE_WEB_CLIENT_ID=values['GOOGLE_WEB_CLIENT_ID'],INFERENCE_URL=url)
             Path(args.env_file).write_text(json.dumps(config,indent=2),'utf-8')
