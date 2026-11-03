@@ -147,14 +147,14 @@ jobs:
           INFERENCE_IMAGE="$(docker inspect --format '{{index .RepoDigests 0}}' "$base/inference:$GITHUB_SHA")"
           API_IMAGE="$(docker inspect --format '{{index .RepoDigests 0}}' "$base/api:$GITHUB_SHA")"
           gcloud run deploy automind-inference --project "$GCP_PROJECT_ID" --region "$GCP_REGION" \
-            --image "$INFERENCE_IMAGE" --service-account "automind-inference@$GCP_PROJECT_ID.iam.gserviceaccount.com" \
+            --image "$INFERENCE_IMAGE" --service-account "storeml-inference@$GCP_PROJECT_ID.iam.gserviceaccount.com" \
             --port 8080 --cpu 1 --memory 512Mi --min-instances 0 --max-instances 3 \
             --concurrency 4 --timeout 60 --ingress all --quiet
           export INFERENCE_URL
           INFERENCE_URL="$(gcloud run services describe automind-inference --project "$GCP_PROJECT_ID" --region "$GCP_REGION" --format='value(status.url)')"
           python infra/github_config.py --env-file "$RUNNER_TEMP/api-env.json"
           gcloud run deploy automind-api --project "$GCP_PROJECT_ID" --region "$GCP_REGION" \
-            --image "$API_IMAGE" --service-account "automind-api@$GCP_PROJECT_ID.iam.gserviceaccount.com" \
+            --image "$API_IMAGE" --service-account "storeml-api@$GCP_PROJECT_ID.iam.gserviceaccount.com" \
             --port 8080 --cpu 1 --memory 512Mi --min-instances 0 --max-instances 3 \
             --concurrency 40 --timeout 65 --ingress all --env-vars-file "$RUNNER_TEMP/api-env.json" \
             --set-secrets "DB_PASSWORD=$DB_PASSWORD_SECRET:$DB_PASSWORD_SECRET_VERSION" --quiet
