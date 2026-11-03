@@ -7,7 +7,7 @@ class ConfigTests(unittest.TestCase):
             GCP_WIF_PROVIDER='projects/123456/locations/global/workloadIdentityPools/github/providers/storeml',
             GCP_DEPLOY_SERVICE_ACCOUNT='storeml-deploy@automind-demo.iam.gserviceaccount.com',
             ARTIFACT_REPOSITORY='storeml',INSTANCE_CONNECTION_NAME='automind-demo:southamerica-west1:storeml-pg',
-            GOOGLE_WEB_CLIENT_ID='123-abc.apps.googleusercontent.com',DB_PASSWORD_SECRET='automind-db-password',
+            GOOGLE_WEB_CLIENT_ID='123-abc.apps.googleusercontent.com',DB_PASSWORD_SECRET='storeml-db-password',
             DB_PASSWORD_SECRET_VERSION='1')
     def test_valid_values(self):self.assertEqual(validate(self.env),self.env)
     def test_missing_variables(self):

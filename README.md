@@ -2,6 +2,8 @@
 
 App Android/iOS con Google Gmail, Store, solicitudes y acceso por ID. Las 24 calculadoras suman tres inputs; cada una tiene su propio `.py` y un `MODEL_ID` entero único de ocho dígitos (10000001 a 10000024). La estética mantiene Skia, RaTeX y tipografía de máquina de escribir. Sin WebView ni AppView.
 
+Android utiliza `com.storeml.app` como applicationId y namespace. Las clases Kotlin están en `mobile/android/app/src/main/java/com/storeml/app/`. `mobile/src/config.ts` contiene la URL de Cloud Run y el ID OAuth Web proporcionados para MLStore; son identificadores públicos. El repositorio es público por decisión del propietario.
+
 ## Una base y cuatro tablas
 
 La base PostgreSQL `storeml_database` tiene exactamente cuatro tablas de aplicación en `public`:
@@ -36,9 +38,9 @@ Configura una vez Workload Identity Federation, la cuenta `storeml-deploy`, sus 
 
 El flujo publica imágenes en Artifact Registry y despliega sus digests. Serializa despliegues y omite commits pendientes que ya no sean el actual de `main`. No modifica las cuatro tablas ni sus datos; los SQL iniciales se ejecutan manualmente. El acceso público de la API y la autorización de API al motor privado se configuran una vez en Cloud Run. La compilación y publicación móvil siguen los pasos Android/iOS del manual.
 
-La ejecución de GitHub Actions 41709403113 pasó las pruebas y se detuvo por variables Google Cloud ausentes. Las cuentas de ejecución ahora son storeml-api y storeml-inference; el despliegue utiliza storeml-deploy. Los servicios Cloud Run conservan los nombres automind-api y automind-inference. No se ha completado un despliegue real en Google Cloud.
+El usuario completó el despliegue en Google Cloud. Las cuentas de ejecución son storeml-api y storeml-inference; el despliegue utiliza storeml-deploy. Los servicios Cloud Run conservan los nombres automind-api y automind-inference. Se comprobó que la API real rechaza peticiones sin sesión y tokens inválidos; queda pendiente probar el login Google desde un dispositivo Android.
 
-## Rutas del repositorio privado
+## Rutas del repositorio público
 
 Ejemplo: ID `10000002`, `archivo = inference/modelos/inmobiliario/cart.py`, `MODEL_ID = 10000002`. El contenedor ejecuta su copia desplegada. La columna documenta la ubicación; no permite importar una ruta arbitraria enviada por el teléfono. Si mueves un archivo, ajusta registro, columna y despliegue.
 
@@ -56,4 +58,4 @@ En `api`, con Python 3.10/3.11: `pip install -r requirements-test.txt` y `python
 
 Para Android: Node 22.11+, JDK 17, SDK/Build Tools 36, NDK 27.1.12297006. Extrae en ruta corta, completa `mobile/src/config.ts`, ejecuta `npm ci`, `npm run typecheck` y compila desde Android Studio o `mobile/android/gradlew.bat`. Firma release con tus propiedades `AUTOMIND_*`. El manual cubre APK/AAB, SHA-1 y configuración iOS.
 
-La compilación nativa anterior no terminó por espacio de disco; no se entrega APK. No se desplegaron recursos en tu cuenta. Consulta `docs/VERIFICACION.md` para las comprobaciones realizadas y sus límites.
+No se entrega APK. Consulta `docs/VERIFICACION.md` para las comprobaciones realizadas y sus límites. El ZIP contiene las fuentes para compilar.

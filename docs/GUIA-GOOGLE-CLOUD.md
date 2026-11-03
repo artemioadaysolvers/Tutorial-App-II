@@ -8,7 +8,7 @@ Una sola base PostgreSQL llamada storeml_database contiene exactamente cuatro ta
 
 Los 24 modelos siguen siendo calculadoras: Input 1 + Input 2 + Input 3. Admiten negativos y decimales, con rango de -1.000.000.000.000 a 1.000.000.000.000 por input. Sus IDs son enteros únicos de ocho dígitos, del 10000001 al 10000024. Los nombres KS, CART, Red Neuronal, Regresión, Holt Winters y Prophet son etiquetas; todos suman.
 
-Los archivos están organizados primero por modelos y luego por área: inference/modelos/inmobiliario/cart.py, por ejemplo. Cada Python declara MODEL_ID y contiene su propia función calcular. En la tabla modelos, la columna archivo guarda la ruta relativa desde la raíz del repositorio privado de GitHub.
+Los archivos están organizados primero por modelos y luego por área: inference/modelos/inmobiliario/cart.py, por ejemplo. Cada Python declara MODEL_ID y contiene su propia función calcular. En la tabla modelos, la columna archivo guarda la ruta relativa desde la raíz del repositorio público de GitHub.
 
 GitHub aporta las fuentes durante el build. Cloud Run ejecuta la copia del código incluida en su contenedor. El ID se resuelve mediante un registro fijo de módulos permitidos; cambiar la columna archivo por sí sola no ejecuta otro archivo. La app no envía rutas ni credenciales de GitHub.
 
@@ -72,7 +72,7 @@ Deben aparecer modelos, permisos, solicitudes y usuarios. El contador de cuota s
 
 ## 5. Guardar la contraseña y preparar la conexión
 
-Abre Secret Manager > Crear secreto. Nombre: automind-db-password. Como valor escribe únicamente la contraseña de storeml_app, sin comillas y sin salto de línea adicional. Guarda el secreto y anota la versión, por ejemplo 1.
+Abre Secret Manager > Crear secreto. Nombre: storeml-db-password. Como valor escribe únicamente la contraseña de storeml_app, sin comillas y sin salto de línea adicional. Guarda el secreto y anota la versión, por ejemplo 1.
 
 En los permisos de ese secreto agrega el email completo de storeml-api@TU_PROYECTO.iam.gserviceaccount.com y el rol Secret Manager Secret Accessor (roles/secretmanager.secretAccessor). Limita el acceso al secreto necesario; el motor de calculadoras no necesita esta contraseña.
 
@@ -100,7 +100,7 @@ En Google Auth Platform abre Branding y completa AutoMind, email de soporte y da
 
 En Clients > Create client crea Web application. Guarda su Client ID terminado en .apps.googleusercontent.com. Ese mismo ID va en GOOGLE_WEB_CLIENT_ID de la API y googleWebClientId de mobile/src/config.ts. No se usa el secreto OAuth Web en el móvil.
 
-Crea un cliente de tipo Android con package name com.automind y el SHA-1 del certificado que firmará la app. El paso 13 explica cómo obtenerlo con Android Studio. Registra los certificados debug y release que utilices; para Play App Signing añade también el certificado de firma mostrado en Play Console.
+Crea un cliente de tipo Android con package name com.storeml.app y el SHA-1 del certificado que firmará la app. Para el APK debug de este ZIP la huella SHA-1 verificada es 5E:8F:16:06:2E:A3:CD:2C:4A:0D:54:78:76:BA:A6:F3:8C:AB:F6:25. El paso 13 explica cómo obtenerla con Android Studio. Registra los certificados debug y release que utilices; para Play App Signing añade también el certificado de firma mostrado en Play Console.
 
 Para iOS crea un cliente con bundle ID com.automind. Copia su Client ID a googleIOSClientId y el iOS URL scheme a mobile/ios/AutoMind/Info.plist, reemplazando REEMPLAZAR_REVERSED_IOS_CLIENT_ID. El cliente Android, iOS y Web deben corresponder al proyecto adecuado.
 
@@ -109,7 +109,7 @@ La API verifica firma, audiencia, emisor, expiración y Gmail verificado. El reg
 
 ## 7. Subir el repositorio y obtener sus IDs
 
-Crea o utiliza un repositorio privado en GitHub. Sube el contenido extraído de AutoMind, con api, inference, sql, mobile, catalog, infra y docs directamente en la raíz. Incluye .gitignore y la carpeta oculta .github. El workflow debe quedar en .github/workflows/deploy.yml.
+Crea o utiliza un repositorio público en GitHub. Sube el contenido extraído de AutoMind, con api, inference, sql, mobile, catalog, infra y docs directamente en la raíz. Incluye .gitignore y la carpeta oculta .github. El workflow debe quedar en .github/workflows/deploy.yml.
 
 Si subes por lotes usando Add file > Upload files, carga .github al final para que las pruebas ya encuentren las fuentes. Mantén main como rama principal. No subas el ZIP como archivo ni contraseñas, claves o resultados de compilación.
 
@@ -169,7 +169,7 @@ INSTANCE_CONNECTION_NAME    PROYECTO:REGIÓN:storeml-pg
 GOOGLE_WEB_CLIENT_ID         Cliente OAuth Web real
 GCP_REGION                  southamerica-west1
 ARTIFACT_REPOSITORY          storeml
-DB_PASSWORD_SECRET          automind-db-password
+DB_PASSWORD_SECRET          storeml-db-password
 DB_PASSWORD_SECRET_VERSION  1
 ```
 
@@ -257,7 +257,7 @@ Desde la terminal local de la carpeta mobile ejecuta npm ci para instalar las li
 
 Para el SHA-1 de debug abre el panel Gradle > app > Tasks > android > signingReport y ejecútalo. Si no se muestra esa tarea, desde la terminal local de mobile/android ejecuta .\gradlew.bat signingReport. Copia el SHA-1 de la variante debug al cliente OAuth Android del paso 6.
 
-Para desarrollo, desde mobile ejecuta npm start y, en otra terminal, npm run android con un dispositivo conectado o emulador con Google Play Services. El debug utiliza Metro. Completa config.ts antes de probar el login.
+Para desarrollo, desde mobile ejecuta npm start y, en otra terminal, npm run android con un dispositivo conectado o emulador con Google Play Services. El debug utiliza Metro. Esta entrega ya configura mobile/src/config.ts con la URL HTTPS de automind-api y el ID OAuth Web de MLStore. El applicationId y namespace de Android son com.storeml.app; deben coincidir con el cliente Android creado en Google. El identificador del componente React Native continúa siendo AutoMind.
 
 Para un APK/AAB release, en Android Studio usa Build > Generate Signed App Bundle / APK > Create new para crear tu clave privada. Anota la ruta, alias y contraseñas y guarda una copia segura. Configura las cuatro propiedades AUTOMIND_STORE_FILE, AUTOMIND_STORE_PASSWORD, AUTOMIND_KEY_ALIAS y AUTOMIND_KEY_PASSWORD en tu archivo personal ~/.gradle/gradle.properties; no las agregues al repositorio.
 
