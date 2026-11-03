@@ -17,7 +17,7 @@ No se utiliza Firestore ni Firebase. Los IDs de modelo son números, no strings,
 
 - `sql/01-esquema.sql`: las cuatro tablas y restricciones.
 - `sql/02-catalogo-y-accesos.sql`: 24 modelos con sus rutas y los 12 permisos de artemioaday@gmail.com (KS, CART y Red Neuronal por área). No crea un usuario Google ficticio.
-- `sql/03-privilegios-app.sql`: permisos SQL mínimos para `automind_app`.
+- `sql/03-privilegios-app.sql`: permisos SQL mínimos para `storeml_app`.
 - `api/`: backend Python con FastAPI, SQLAlchemy, pg8000, consultas parametrizadas y conector Python oficial de Cloud SQL.
 - `inference/modelos/<área>/<modelo>.py`: los 24 archivos Python independientes.
 - `inference/registry.py`: lista fija de IDs y módulos permitidos.
@@ -26,7 +26,7 @@ No se utiliza Firestore ni Firebase. Los IDs de modelo son números, no strings,
 - `infra/`: validación de configuración de GitHub Actions y sus pruebas Python.
 - `docs/GUIA-GOOGLE-CLOUD.pdf` y `.md`: manual completo de creación por interfaz, Cloud SQL Studio, secretos, OAuth, despliegue, edición de datos y compilación.
 
-En Cloud SQL Studio, como administrador de `storeml_database`, ejecuta los tres archivos SQL en orden después de crear el usuario `automind_app`. El manual contiene todos los pasos. Los archivos iniciales conservan cambios existentes y no vuelven a habilitar permisos revocados.
+En Cloud SQL Studio, como administrador de `storeml_database`, ejecuta los tres archivos SQL en orden después de crear el usuario `storeml_app`. El manual contiene todos los pasos. Los archivos iniciales conservan cambios existentes y no vuelven a habilitar permisos revocados.
 
 ## GitHub Actions
 
@@ -44,7 +44,7 @@ Ejemplo: ID `10000002`, `archivo = inference/modelos/inmobiliario/cart.py`, `MOD
 
 ## Conexión de producción
 
-Cuenta de servicio de API con Cloud SQL Client y acceso al secreto de su contraseña. Variables `INSTANCE_CONNECTION_NAME`, `DB_NAME=storeml_database`, `DB_USER=automind_app`, `GOOGLE_WEB_CLIENT_ID`, `INFERENCE_URL`; `DB_PASSWORD` referenciado desde Secret Manager. No usar `postgres` como usuario de aplicación. El motor Python queda privado y separado de PostgreSQL.
+Cuenta de servicio de API con Cloud SQL Client y acceso al secreto de su contraseña. Variables `INSTANCE_CONNECTION_NAME`, `DB_NAME=storeml_database`, `DB_USER=storeml_app`, `GOOGLE_WEB_CLIENT_ID`, `INFERENCE_URL`; `DB_PASSWORD` referenciado desde Secret Manager. No usar `postgres` como usuario de aplicación. El motor Python queda privado y separado de PostgreSQL.
 
 Para ejecutar la API usa `uvicorn automind_api.main:app --host 0.0.0.0 --port 8080` después de configurar las variables de conexión y OAuth. Para desarrollo puede usarse `DATABASE_URL=postgresql+pg8000://...` con `APP_ENV` distinto de production. En Cloud Run el conector oficial es obligatorio.
 
