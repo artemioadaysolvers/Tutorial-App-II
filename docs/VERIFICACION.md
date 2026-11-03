@@ -4,6 +4,8 @@ Fecha: 3 de noviembre de 2026.
 
 ## Comprobado
 
+- La configuración de despliegue usa DB_NAME=storeml_database. El SQL de privilegios, sus pruebas y los ejemplos utilizan ese nombre. La instancia de ejemplo es storeml-pg y el repositorio Artifact Registry es storeml.
+
 - API completamente en Python: FastAPI, google-auth, SQLAlchemy, pg8000 y Cloud SQL Python Connector. Se retiraron las fuentes TypeScript, scripts npm y package.json de la API.
 - `python -m unittest discover -s tests -v`: 22 pruebas aprobadas en Python. Catorce verifican rutas protegidas, registro de identidad validada, Gmail verificado, IDs numéricos, campos extra, inyección de correo, suma, revocación entre peticiones y durante cálculo, solicitudes, cuota, errores y límite de cuerpo.
 - Las ocho pruebas PostgreSQL utilizaron SQLAlchemy/pg8000 por protocolo PostgreSQL contra un servidor PGlite local de QA. Ejecutaron los archivos SQL reales (adaptando solo el nombre de base del test) y verificaron cuatro tablas, 24 rutas, 12 permisos reservados, claves y unicidad, vinculación correcta, solicitudes idempotentes, SQL parametrizado, revocación, cuota de 30/40 y rol limitado.
@@ -20,4 +22,5 @@ Fecha: 3 de noviembre de 2026.
 - No se probó Cloud SQL, TLS del conector, Secret Manager o IAM en la cuenta del usuario. No se desplegaron recursos ni se realizó login con sus clientes OAuth. Las pruebas de identidad inyectan o simulan el verificador; producción utiliza google-auth.verify_oauth2_token.
 - No se generó un APK ni se compiló iOS. La migración cambia el servidor y no los componentes nativos del móvil. La compilación nativa anterior se detuvo por falta de espacio; el último TypeScript y bundle del móvil habían pasado.
 - El contenedor Linux no se ejecutó aquí.
-- No se ha ejecutado el workflow en GitHub Actions ni se ha probado este despliegue contra Google Cloud. Requiere la configuración inicial del manual, incluyendo IAM, variables y recursos. El PostgreSQL 17 del workflow se ejecutará en GitHub; la verificación SQL local descrita arriba utilizó PGlite.
+- Se verificó la ejecución 41709403113 en GitHub Actions: identidad y todas las etapas de pruebas finalizaron correctamente, incluyendo PostgreSQL 17 de CI. El despliegue se detuvo en Validar variables de despliegue por cinco variables ausentes; no compiló ni publicó imágenes ni se autenticó en Google Cloud.
+- Se actualizaron las cuentas de ejecución a storeml-api y storeml-inference, y la documentación de storeml-deploy. Las pruebas previas en GitHub usaron el workflow antes de este ajuste de nombres; el workflow actualizado se valida localmente con actionlint. La configuración de Google Cloud se está realizando manualmente y aún no se ha verificado un despliegue real.
