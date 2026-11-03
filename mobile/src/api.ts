@@ -1,71 +1,19 @@
-import { getAuth, getIdToken } from '@react-native-firebase/auth';
-import { config } from './config';
-import { Expr } from './expression';
-import { Variable } from './distributions';
-type BaseSpec = {
-  title: string;
-  variables: Variable[];
-  samples: 100;
-};
-export type Spec = BaseSpec &
-  ({ version: 1; expression: Expr } | { version: 2; expressions: Expr[] });
-export const components = (spec: Spec): Expr[] =>
-  spec.version === 1 ? [spec.expression] : spec.expressions;
-export type Usage = {
-  day_utc: string;
-  used: number;
-  limit: number;
-  remaining: number;
-  running: boolean;
-  resets_at: string;
-};
-export type Summary = {
-  id: string;
-  title: string;
-  created_at: string;
-  color: string;
-  dimensions: number;
-};
-export type Experiment = Summary & { results: number[]; spec: Spec };
-export async function api<T>(
-  path: string,
-  method = 'GET',
-  body?: Spec,
-  key?: string,
-  resource = '/v1/experiments',
-): Promise<T> {
-  const user = getAuth().currentUser;
-  if (!user) throw Error('Inicia sesión con Google.');
-  const token = await getIdToken(user),
-    controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 90000);
-  try {
-    const response = await fetch(config.apiUrl + resource + path, {
-      method,
-      signal: controller.signal,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        ...(key ? { 'Idempotency-Key': key } : {}),
-      },
-      body: body ? JSON.stringify(body) : undefined,
-    });
-    if (!response.ok) {
-      const data = await response.json().catch(() => ({}));
-      throw Error(
-        typeof data.detail === 'string'
-          ? data.detail
-          : `Error ${response.status}. Reintenta.`,
-      );
-    }
-    return response.status === 204 ? (undefined as T) : await response.json();
-  } catch (e) {
-    if (e instanceof Error && e.name === 'AbortError')
-      throw Error(
-        'Se agotó la espera de red. Actualiza la lista antes de reintentar: el servidor pudo haber guardado el experimento.',
-      );
-    throw e;
-  } finally {
-    clearTimeout(timeout);
-  }
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import {CONFIG} from './config';
+export type Field={key:string;label:string;min:number;max:number;integer?:boolean};
+export type Model={id:number;area:string;name:string;description:string;algorithm:string;formula:string;unit:string;fields:Field[];demo:boolean};
+export type Me={email:string;modelIds:number[];requested:number[]};
+export type Result={modelId:number;values:number[];dates?:string[];unit:string;demo:boolean};
+export async function api<T>(path:string,body?:unknown):Promise<T>{
+  if(CONFIG.apiUrl.includes('REEMPLAZAR')||!CONFIG.apiUrl.startsWith('https://'))throw Error('Configura src/config.ts con tu URL de Cloud Run y cliente OAuth.');
+  const {idToken}=await GoogleSignin.getTokens();
+  if(!idToken)throw Error('Vuelve a iniciar sesión con Google.');
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),65000);
+  try{
+    const r=await fetch(CONFIG.apiUrl+path,{method:body===undefined?'GET':'POST',headers:{Authorization:`Bearer ${idToken}`,'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body),signal:controller.signal});
+    const data=await r.json();
+    if(!r.ok)throw Error(data.error||`Error ${r.status}`);
+    return data as T;
+  }catch(e){if(e instanceof Error&&e.name==='AbortError')throw Error('La solicitud tardó demasiado. Inténtalo nuevamente.');throw e;}
+  finally{clearTimeout(timer);}
 }

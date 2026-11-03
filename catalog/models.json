@@ -1,0 +1,770 @@
+[
+  {
+    "id": 10000001,
+    "area": "Mercado Inmobiliario",
+    "name": "Árbol de Decisión KS",
+    "algorithm": "suma",
+    "description": "Calculadora de suma para Mercado Inmobiliario. Suma los tres inputs numéricos y devuelve el total. ID: 10000001.",
+    "formula": "y=x_1+x_2+x_3",
+    "unit": "unidades",
+    "active": true,
+    "demo": true,
+    "fields": [
+      {
+        "key": "input1",
+        "label": "Input 1",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input2",
+        "label": "Input 2",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input3",
+        "label": "Input 3",
+        "min": -1000000000000,
+        "max": 1000000000000
+      }
+    ],
+    "archivo": "inference/modelos/inmobiliario/ks.py"
+  },
+  {
+    "id": 10000002,
+    "area": "Mercado Inmobiliario",
+    "name": "Árbol de Decisión CART",
+    "algorithm": "suma",
+    "description": "Calculadora de suma para Mercado Inmobiliario. Suma los tres inputs numéricos y devuelve el total. ID: 10000002.",
+    "formula": "y=x_1+x_2+x_3",
+    "unit": "unidades",
+    "active": true,
+    "demo": true,
+    "fields": [
+      {
+        "key": "input1",
+        "label": "Input 1",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input2",
+        "label": "Input 2",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input3",
+        "label": "Input 3",
+        "min": -1000000000000,
+        "max": 1000000000000
+      }
+    ],
+    "archivo": "inference/modelos/inmobiliario/cart.py"
+  },
+  {
+    "id": 10000003,
+    "area": "Mercado Inmobiliario",
+    "name": "Red Neuronal",
+    "algorithm": "suma",
+    "description": "Calculadora de suma para Mercado Inmobiliario. Suma los tres inputs numéricos y devuelve el total. ID: 10000003.",
+    "formula": "y=x_1+x_2+x_3",
+    "unit": "unidades",
+    "active": true,
+    "demo": true,
+    "fields": [
+      {
+        "key": "input1",
+        "label": "Input 1",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input2",
+        "label": "Input 2",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input3",
+        "label": "Input 3",
+        "min": -1000000000000,
+        "max": 1000000000000
+      }
+    ],
+    "archivo": "inference/modelos/inmobiliario/red_neuronal.py"
+  },
+  {
+    "id": 10000004,
+    "area": "Mercado Inmobiliario",
+    "name": "Regresión Lineal Múltiple",
+    "algorithm": "suma",
+    "description": "Calculadora de suma para Mercado Inmobiliario. Suma los tres inputs numéricos y devuelve el total. ID: 10000004.",
+    "formula": "y=x_1+x_2+x_3",
+    "unit": "unidades",
+    "active": true,
+    "demo": true,
+    "fields": [
+      {
+        "key": "input1",
+        "label": "Input 1",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input2",
+        "label": "Input 2",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input3",
+        "label": "Input 3",
+        "min": -1000000000000,
+        "max": 1000000000000
+      }
+    ],
+    "archivo": "inference/modelos/inmobiliario/regresion.py"
+  },
+  {
+    "id": 10000005,
+    "area": "Mercado Inmobiliario",
+    "name": "Holt Winters",
+    "algorithm": "suma",
+    "description": "Calculadora de suma para Mercado Inmobiliario. Suma los tres inputs numéricos y devuelve el total. ID: 10000005.",
+    "formula": "y=x_1+x_2+x_3",
+    "unit": "unidades",
+    "active": true,
+    "demo": true,
+    "fields": [
+      {
+        "key": "input1",
+        "label": "Input 1",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input2",
+        "label": "Input 2",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input3",
+        "label": "Input 3",
+        "min": -1000000000000,
+        "max": 1000000000000
+      }
+    ],
+    "archivo": "inference/modelos/inmobiliario/holt_winters.py"
+  },
+  {
+    "id": 10000006,
+    "area": "Mercado Inmobiliario",
+    "name": "Prophet de Meta",
+    "algorithm": "suma",
+    "description": "Calculadora de suma para Mercado Inmobiliario. Suma los tres inputs numéricos y devuelve el total. ID: 10000006.",
+    "formula": "y=x_1+x_2+x_3",
+    "unit": "unidades",
+    "active": true,
+    "demo": true,
+    "fields": [
+      {
+        "key": "input1",
+        "label": "Input 1",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input2",
+        "label": "Input 2",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input3",
+        "label": "Input 3",
+        "min": -1000000000000,
+        "max": 1000000000000
+      }
+    ],
+    "archivo": "inference/modelos/inmobiliario/prophet.py"
+  },
+  {
+    "id": 10000007,
+    "area": "Telecomunicaciones",
+    "name": "Árbol de Decisión KS",
+    "algorithm": "suma",
+    "description": "Calculadora de suma para Telecomunicaciones. Suma los tres inputs numéricos y devuelve el total. ID: 10000007.",
+    "formula": "y=x_1+x_2+x_3",
+    "unit": "unidades",
+    "active": true,
+    "demo": true,
+    "fields": [
+      {
+        "key": "input1",
+        "label": "Input 1",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input2",
+        "label": "Input 2",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input3",
+        "label": "Input 3",
+        "min": -1000000000000,
+        "max": 1000000000000
+      }
+    ],
+    "archivo": "inference/modelos/telecomunicaciones/ks.py"
+  },
+  {
+    "id": 10000008,
+    "area": "Telecomunicaciones",
+    "name": "Árbol de Decisión CART",
+    "algorithm": "suma",
+    "description": "Calculadora de suma para Telecomunicaciones. Suma los tres inputs numéricos y devuelve el total. ID: 10000008.",
+    "formula": "y=x_1+x_2+x_3",
+    "unit": "unidades",
+    "active": true,
+    "demo": true,
+    "fields": [
+      {
+        "key": "input1",
+        "label": "Input 1",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input2",
+        "label": "Input 2",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input3",
+        "label": "Input 3",
+        "min": -1000000000000,
+        "max": 1000000000000
+      }
+    ],
+    "archivo": "inference/modelos/telecomunicaciones/cart.py"
+  },
+  {
+    "id": 10000009,
+    "area": "Telecomunicaciones",
+    "name": "Red Neuronal",
+    "algorithm": "suma",
+    "description": "Calculadora de suma para Telecomunicaciones. Suma los tres inputs numéricos y devuelve el total. ID: 10000009.",
+    "formula": "y=x_1+x_2+x_3",
+    "unit": "unidades",
+    "active": true,
+    "demo": true,
+    "fields": [
+      {
+        "key": "input1",
+        "label": "Input 1",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input2",
+        "label": "Input 2",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input3",
+        "label": "Input 3",
+        "min": -1000000000000,
+        "max": 1000000000000
+      }
+    ],
+    "archivo": "inference/modelos/telecomunicaciones/red_neuronal.py"
+  },
+  {
+    "id": 10000010,
+    "area": "Telecomunicaciones",
+    "name": "Regresión Lineal Múltiple",
+    "algorithm": "suma",
+    "description": "Calculadora de suma para Telecomunicaciones. Suma los tres inputs numéricos y devuelve el total. ID: 10000010.",
+    "formula": "y=x_1+x_2+x_3",
+    "unit": "unidades",
+    "active": true,
+    "demo": true,
+    "fields": [
+      {
+        "key": "input1",
+        "label": "Input 1",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input2",
+        "label": "Input 2",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input3",
+        "label": "Input 3",
+        "min": -1000000000000,
+        "max": 1000000000000
+      }
+    ],
+    "archivo": "inference/modelos/telecomunicaciones/regresion.py"
+  },
+  {
+    "id": 10000011,
+    "area": "Telecomunicaciones",
+    "name": "Holt Winters",
+    "algorithm": "suma",
+    "description": "Calculadora de suma para Telecomunicaciones. Suma los tres inputs numéricos y devuelve el total. ID: 10000011.",
+    "formula": "y=x_1+x_2+x_3",
+    "unit": "unidades",
+    "active": true,
+    "demo": true,
+    "fields": [
+      {
+        "key": "input1",
+        "label": "Input 1",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input2",
+        "label": "Input 2",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input3",
+        "label": "Input 3",
+        "min": -1000000000000,
+        "max": 1000000000000
+      }
+    ],
+    "archivo": "inference/modelos/telecomunicaciones/holt_winters.py"
+  },
+  {
+    "id": 10000012,
+    "area": "Telecomunicaciones",
+    "name": "Prophet de Meta",
+    "algorithm": "suma",
+    "description": "Calculadora de suma para Telecomunicaciones. Suma los tres inputs numéricos y devuelve el total. ID: 10000012.",
+    "formula": "y=x_1+x_2+x_3",
+    "unit": "unidades",
+    "active": true,
+    "demo": true,
+    "fields": [
+      {
+        "key": "input1",
+        "label": "Input 1",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input2",
+        "label": "Input 2",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input3",
+        "label": "Input 3",
+        "min": -1000000000000,
+        "max": 1000000000000
+      }
+    ],
+    "archivo": "inference/modelos/telecomunicaciones/prophet.py"
+  },
+  {
+    "id": 10000013,
+    "area": "Minería",
+    "name": "Árbol de Decisión KS",
+    "algorithm": "suma",
+    "description": "Calculadora de suma para Minería. Suma los tres inputs numéricos y devuelve el total. ID: 10000013.",
+    "formula": "y=x_1+x_2+x_3",
+    "unit": "unidades",
+    "active": true,
+    "demo": true,
+    "fields": [
+      {
+        "key": "input1",
+        "label": "Input 1",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input2",
+        "label": "Input 2",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input3",
+        "label": "Input 3",
+        "min": -1000000000000,
+        "max": 1000000000000
+      }
+    ],
+    "archivo": "inference/modelos/mineria/ks.py"
+  },
+  {
+    "id": 10000014,
+    "area": "Minería",
+    "name": "Árbol de Decisión CART",
+    "algorithm": "suma",
+    "description": "Calculadora de suma para Minería. Suma los tres inputs numéricos y devuelve el total. ID: 10000014.",
+    "formula": "y=x_1+x_2+x_3",
+    "unit": "unidades",
+    "active": true,
+    "demo": true,
+    "fields": [
+      {
+        "key": "input1",
+        "label": "Input 1",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input2",
+        "label": "Input 2",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input3",
+        "label": "Input 3",
+        "min": -1000000000000,
+        "max": 1000000000000
+      }
+    ],
+    "archivo": "inference/modelos/mineria/cart.py"
+  },
+  {
+    "id": 10000015,
+    "area": "Minería",
+    "name": "Red Neuronal",
+    "algorithm": "suma",
+    "description": "Calculadora de suma para Minería. Suma los tres inputs numéricos y devuelve el total. ID: 10000015.",
+    "formula": "y=x_1+x_2+x_3",
+    "unit": "unidades",
+    "active": true,
+    "demo": true,
+    "fields": [
+      {
+        "key": "input1",
+        "label": "Input 1",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input2",
+        "label": "Input 2",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input3",
+        "label": "Input 3",
+        "min": -1000000000000,
+        "max": 1000000000000
+      }
+    ],
+    "archivo": "inference/modelos/mineria/red_neuronal.py"
+  },
+  {
+    "id": 10000016,
+    "area": "Minería",
+    "name": "Regresión Lineal Múltiple",
+    "algorithm": "suma",
+    "description": "Calculadora de suma para Minería. Suma los tres inputs numéricos y devuelve el total. ID: 10000016.",
+    "formula": "y=x_1+x_2+x_3",
+    "unit": "unidades",
+    "active": true,
+    "demo": true,
+    "fields": [
+      {
+        "key": "input1",
+        "label": "Input 1",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input2",
+        "label": "Input 2",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input3",
+        "label": "Input 3",
+        "min": -1000000000000,
+        "max": 1000000000000
+      }
+    ],
+    "archivo": "inference/modelos/mineria/regresion.py"
+  },
+  {
+    "id": 10000017,
+    "area": "Minería",
+    "name": "Holt Winters",
+    "algorithm": "suma",
+    "description": "Calculadora de suma para Minería. Suma los tres inputs numéricos y devuelve el total. ID: 10000017.",
+    "formula": "y=x_1+x_2+x_3",
+    "unit": "unidades",
+    "active": true,
+    "demo": true,
+    "fields": [
+      {
+        "key": "input1",
+        "label": "Input 1",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input2",
+        "label": "Input 2",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input3",
+        "label": "Input 3",
+        "min": -1000000000000,
+        "max": 1000000000000
+      }
+    ],
+    "archivo": "inference/modelos/mineria/holt_winters.py"
+  },
+  {
+    "id": 10000018,
+    "area": "Minería",
+    "name": "Prophet de Meta",
+    "algorithm": "suma",
+    "description": "Calculadora de suma para Minería. Suma los tres inputs numéricos y devuelve el total. ID: 10000018.",
+    "formula": "y=x_1+x_2+x_3",
+    "unit": "unidades",
+    "active": true,
+    "demo": true,
+    "fields": [
+      {
+        "key": "input1",
+        "label": "Input 1",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input2",
+        "label": "Input 2",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input3",
+        "label": "Input 3",
+        "min": -1000000000000,
+        "max": 1000000000000
+      }
+    ],
+    "archivo": "inference/modelos/mineria/prophet.py"
+  },
+  {
+    "id": 10000019,
+    "area": "Forestal",
+    "name": "Árbol de Decisión KS",
+    "algorithm": "suma",
+    "description": "Calculadora de suma para Forestal. Suma los tres inputs numéricos y devuelve el total. ID: 10000019.",
+    "formula": "y=x_1+x_2+x_3",
+    "unit": "unidades",
+    "active": true,
+    "demo": true,
+    "fields": [
+      {
+        "key": "input1",
+        "label": "Input 1",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input2",
+        "label": "Input 2",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input3",
+        "label": "Input 3",
+        "min": -1000000000000,
+        "max": 1000000000000
+      }
+    ],
+    "archivo": "inference/modelos/forestal/ks.py"
+  },
+  {
+    "id": 10000020,
+    "area": "Forestal",
+    "name": "Árbol de Decisión CART",
+    "algorithm": "suma",
+    "description": "Calculadora de suma para Forestal. Suma los tres inputs numéricos y devuelve el total. ID: 10000020.",
+    "formula": "y=x_1+x_2+x_3",
+    "unit": "unidades",
+    "active": true,
+    "demo": true,
+    "fields": [
+      {
+        "key": "input1",
+        "label": "Input 1",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input2",
+        "label": "Input 2",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input3",
+        "label": "Input 3",
+        "min": -1000000000000,
+        "max": 1000000000000
+      }
+    ],
+    "archivo": "inference/modelos/forestal/cart.py"
+  },
+  {
+    "id": 10000021,
+    "area": "Forestal",
+    "name": "Red Neuronal",
+    "algorithm": "suma",
+    "description": "Calculadora de suma para Forestal. Suma los tres inputs numéricos y devuelve el total. ID: 10000021.",
+    "formula": "y=x_1+x_2+x_3",
+    "unit": "unidades",
+    "active": true,
+    "demo": true,
+    "fields": [
+      {
+        "key": "input1",
+        "label": "Input 1",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input2",
+        "label": "Input 2",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input3",
+        "label": "Input 3",
+        "min": -1000000000000,
+        "max": 1000000000000
+      }
+    ],
+    "archivo": "inference/modelos/forestal/red_neuronal.py"
+  },
+  {
+    "id": 10000022,
+    "area": "Forestal",
+    "name": "Regresión Lineal Múltiple",
+    "algorithm": "suma",
+    "description": "Calculadora de suma para Forestal. Suma los tres inputs numéricos y devuelve el total. ID: 10000022.",
+    "formula": "y=x_1+x_2+x_3",
+    "unit": "unidades",
+    "active": true,
+    "demo": true,
+    "fields": [
+      {
+        "key": "input1",
+        "label": "Input 1",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input2",
+        "label": "Input 2",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input3",
+        "label": "Input 3",
+        "min": -1000000000000,
+        "max": 1000000000000
+      }
+    ],
+    "archivo": "inference/modelos/forestal/regresion.py"
+  },
+  {
+    "id": 10000023,
+    "area": "Forestal",
+    "name": "Holt Winters",
+    "algorithm": "suma",
+    "description": "Calculadora de suma para Forestal. Suma los tres inputs numéricos y devuelve el total. ID: 10000023.",
+    "formula": "y=x_1+x_2+x_3",
+    "unit": "unidades",
+    "active": true,
+    "demo": true,
+    "fields": [
+      {
+        "key": "input1",
+        "label": "Input 1",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input2",
+        "label": "Input 2",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input3",
+        "label": "Input 3",
+        "min": -1000000000000,
+        "max": 1000000000000
+      }
+    ],
+    "archivo": "inference/modelos/forestal/holt_winters.py"
+  },
+  {
+    "id": 10000024,
+    "area": "Forestal",
+    "name": "Prophet de Meta",
+    "algorithm": "suma",
+    "description": "Calculadora de suma para Forestal. Suma los tres inputs numéricos y devuelve el total. ID: 10000024.",
+    "formula": "y=x_1+x_2+x_3",
+    "unit": "unidades",
+    "active": true,
+    "demo": true,
+    "fields": [
+      {
+        "key": "input1",
+        "label": "Input 1",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input2",
+        "label": "Input 2",
+        "min": -1000000000000,
+        "max": 1000000000000
+      },
+      {
+        "key": "input3",
+        "label": "Input 3",
+        "min": -1000000000000,
+        "max": 1000000000000
+      }
+    ],
+    "archivo": "inference/modelos/forestal/prophet.py"
+  }
+]

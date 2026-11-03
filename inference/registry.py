@@ -1,0 +1,28 @@
+"""IDs numéricos de 8 dígitos: rutas permitidas del contenedor desplegado."""
+
+MODELS = {
+    10000001: 'modelos.inmobiliario.ks',
+    10000002: 'modelos.inmobiliario.cart',
+    10000003: 'modelos.inmobiliario.red_neuronal',
+    10000004: 'modelos.inmobiliario.regresion',
+    10000005: 'modelos.inmobiliario.holt_winters',
+    10000006: 'modelos.inmobiliario.prophet',
+    10000007: 'modelos.telecomunicaciones.ks',
+    10000008: 'modelos.telecomunicaciones.cart',
+    10000009: 'modelos.telecomunicaciones.red_neuronal',
+    10000010: 'modelos.telecomunicaciones.regresion',
+    10000011: 'modelos.telecomunicaciones.holt_winters',
+    10000012: 'modelos.telecomunicaciones.prophet',
+    10000013: 'modelos.mineria.ks',
+    10000014: 'modelos.mineria.cart',
+    10000015: 'modelos.mineria.red_neuronal',
+    10000016: 'modelos.mineria.regresion',
+    10000017: 'modelos.mineria.holt_winters',
+    10000018: 'modelos.mineria.prophet',
+    10000019: 'modelos.forestal.ks',
+    10000020: 'modelos.forestal.cart',
+    10000021: 'modelos.forestal.red_neuronal',
+    10000022: 'modelos.forestal.regresion',
+    10000023: 'modelos.forestal.holt_winters',
+    10000024: 'modelos.forestal.prophet',
+}

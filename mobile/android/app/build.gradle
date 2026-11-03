@@ -1,9 +1,6 @@
 apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
-if (file('google-services.json').exists()) {
-    apply plugin: 'com.google.gms.google-services'
-}
 
 /**
  * This is the configuration block to customize your React Native Android app.
@@ -75,20 +72,34 @@ def enableProguardInReleaseBuilds = false
  */
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
+def releaseKeys = ['AUTOMIND_STORE_FILE','AUTOMIND_STORE_PASSWORD','AUTOMIND_KEY_ALIAS','AUTOMIND_KEY_PASSWORD']
+def releaseValue = { key -> project.findProperty(key) ?: System.getenv(key) }
+def signedRelease = releaseKeys.every { releaseValue(it) }
+if (gradle.startParameter.taskNames.any { it.toLowerCase().contains('release') } && !signedRelease) {
+    throw new GradleException('Configura las cuatro propiedades AUTOMIND_* de firma antes de compilar release.')
+}
 android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.montecarlolab"
+    namespace "com.automind"
     defaultConfig {
-        applicationId "com.montecarlolab"
+        applicationId "com.automind"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0"
+        versionName "6.0.0"
     }
     signingConfigs {
+        if (signedRelease) {
+            release {
+                storeFile file(releaseValue('AUTOMIND_STORE_FILE'))
+                storePassword releaseValue('AUTOMIND_STORE_PASSWORD')
+                keyAlias releaseValue('AUTOMIND_KEY_ALIAS')
+                keyPassword releaseValue('AUTOMIND_KEY_PASSWORD')
+            }
+        }
         debug {
             storeFile file('debug.keystore')
             storePassword 'android'
@@ -103,6 +114,7 @@ android {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
+            if (signedRelease) signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
