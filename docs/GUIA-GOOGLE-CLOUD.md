@@ -4,7 +4,7 @@ React Native + TypeScript | PostgreSQL y cuatro tablas | 3 de noviembre de 2026
 
 ## 1. Qué incluye esta versión
 
-Una sola base PostgreSQL llamada automind contiene exactamente cuatro tablas de la aplicación: usuarios, modelos, permisos y solicitudes. La API está escrita únicamente en Python, con FastAPI, SQLAlchemy, pg8000 y el conector oficial de Cloud SQL. Utiliza consultas SQL parametrizadas. TypeScript se utiliza en la app móvil. La app móvil conserva React Native, TypeScript, Skia, RaTeX y login únicamente Google Gmail.
+Una sola base PostgreSQL llamada storeml_database contiene exactamente cuatro tablas de la aplicación: usuarios, modelos, permisos y solicitudes. La API está escrita únicamente en Python, con FastAPI, SQLAlchemy, pg8000 y el conector oficial de Cloud SQL. Utiliza consultas SQL parametrizadas. TypeScript se utiliza en la app móvil. La app móvil conserva React Native, TypeScript, Skia, RaTeX y login únicamente Google Gmail.
 
 Los 24 modelos siguen siendo calculadoras: Input 1 + Input 2 + Input 3. Admiten negativos y decimales, con rango de -1.000.000.000.000 a 1.000.000.000.000 por input. Sus IDs son enteros únicos de ocho dígitos, del 10000001 al 10000024. Los nombres KS, CART, Red Neuronal, Regresión, Holt Winters y Prophet son etiquetas; todos suman.
 
@@ -19,22 +19,24 @@ El despliegue automático se ejecuta con GitHub Actions al actualizar main, una 
 
 ## 2. Proyecto y cuentas de servicio
 
-En Google Cloud selecciona tu proyecto y vincula facturación. Anota su ID y su número (son distintos). En APIs y servicios > Biblioteca habilita Cloud Run Admin API, Artifact Registry API, Cloud SQL Admin API, Secret Manager API, IAM API, IAM Service Account Credentials API y Security Token Service API. Este flujo no utiliza Cloud Build.
+En Google Cloud selecciona tu proyecto y vincula facturación. Anota su ID y su número (son distintos). En APIs y servicios > Biblioteca habilita Cloud Run Admin API, Artifact Registry API, Cloud SQL Admin API, Secret Manager API, IAM API, IAM Service Account Credentials API, Security Token Service API y Cloud Resource Manager API. Este flujo no utiliza Cloud Build.
 
-En IAM y administración > Cuentas de servicio crea automind-api con Cloud SQL Client. Crea automind-inference sin permisos de base de datos. Conservan las funciones descritas en el manual: API autenticada y motor Python privado. No generes claves JSON.
+En IAM y administración > Cuentas de servicio crea storeml-api con Cloud SQL Client. Crea storeml-inference sin permisos de base de datos. Conservan las funciones descritas en el manual: API autenticada y motor Python privado. No generes claves JSON.
 
-Crea automind-deploy para GitHub Actions. En IAM del proyecto dale Cloud Run Developer (roles/run.developer) y Service Usage Consumer (roles/serviceusage.serviceUsageConsumer). Esta cuenta despliega imágenes pero no administra las políticas públicas/privadas de los servicios. La configuración inicial de esos permisos la realiza tu cuenta administradora en el paso 10.
+Los IDs de las cuentas van en minúsculas: storeml-api, storeml-inference y storeml-deploy. El nombre visible puede usar storeML. Si ya creaste una cuenta con otro ID, crea la cuenta con el ID previsto: el ID no se puede renombrar después de crearla.
 
-En cada cuenta de ejecución automind-api y automind-inference abre Permisos > Otorgar acceso. Agrega el email de automind-deploy y Service Account User (roles/iam.serviceAccountUser). No concedas ese rol indiscriminadamente a todas las cuentas del proyecto.
+Crea storeml-deploy para GitHub Actions. En IAM del proyecto dale Cloud Run Developer (roles/run.developer) y Service Usage Consumer (roles/serviceusage.serviceUsageConsumer). Esta cuenta despliega imágenes pero no administra las políticas públicas/privadas de los servicios. La configuración inicial de esos permisos la realiza tu cuenta administradora en el paso 10.
 
-El rol para publicar imágenes se concederá sobre un único repositorio de Artifact Registry en el paso 9. El acceso federado de GitHub a automind-deploy se configura en el paso 8. Esta cuenta no necesita la contraseña SQL ni Secret Manager Secret Accessor.
+En cada cuenta de ejecución storeml-api y storeml-inference abre Permisos > Otorgar acceso. Agrega el email de storeml-deploy y Service Account User (roles/iam.serviceAccountUser). No concedas ese rol indiscriminadamente a todas las cuentas del proyecto.
+
+El rol para publicar imágenes se concederá sobre un único repositorio de Artifact Registry en el paso 9. El acceso federado de GitHub a storeml-deploy se configura en el paso 8. Esta cuenta no necesita la contraseña SQL ni Secret Manager Secret Accessor.
 
 Tu cuenta administradora necesita permisos para crear la infraestructura y editar IAM. Cloud SQL Studio puede requerir Cloud SQL Studio User además de las credenciales SQL. Los usuarios Gmail de la app no reciben roles de Google Cloud.
 ---
 
 ## 3. Crear la instancia PostgreSQL
 
-En Google Cloud abre SQL > Crear instancia > PostgreSQL. Usa ID de instancia automind-pg. Selecciona PostgreSQL 17 y edición Enterprise. Para comenzar, elige una configuración de desarrollo/prueba compatible con tu presupuesto y revisa la estimación del formulario antes de crearla.
+En Google Cloud abre SQL > Crear instancia > PostgreSQL. Usa ID de instancia storeml-pg. Selecciona PostgreSQL 17 y edición Enterprise. Para esta instalación inicial selecciona Zona de pruebas y personaliza la máquina: núcleo compartido, db-f1-micro, 0,614 GB de memoria, 10 GB SSD y zona única. Comprueba esos valores en el resumen y revisa el costo estimado antes de crearla. El ajuste Zona de pruebas por sí solo no garantiza la máquina mínima.
 
 Configura la contraseña del administrador postgres y guárdala de forma privada. Elige la región donde desplegarás la API, por ejemplo Santiago / southamerica-west1. Abre las opciones de conexiones: habilita Public IP. No agregues 0.0.0.0/0 ni redes autorizadas generales. La API se conectará mediante el conector oficial, con autorización IAM y cifrado.
 
@@ -42,16 +44,16 @@ La IP pública de esta guía se usa para el conector y no requiere exponer una c
 
 En copias de seguridad configura la política de respaldo y recuperación que necesites. Para una instalación inicial puedes usar una única zona; revisa la disponibilidad requerida antes de producción. Crea la instancia y espera su estado disponible.
 
-En Información general copia el Connection name completo, con formato PROYECTO:REGIÓN:automind-pg. No es la dirección IP ni el nombre de la base. Lo usarás como INSTANCE_CONNECTION_NAME de la API.
+En Información general copia el Connection name completo, con formato PROYECTO:REGIÓN:storeml-pg. No es la dirección IP ni el nombre de la base. Lo usarás como INSTANCE_CONNECTION_NAME de la API.
 
 Cloud SQL tiene cargos de instancia, capacidad y almacenamiento aunque la app no reciba solicitudes. Mínimo cero instancias en Cloud Run no apaga PostgreSQL. En Facturación crea un presupuesto y alertas; el aviso no detiene automáticamente el gasto. No se fijan precios en este documento.
 ---
 
 ## 4. Crear la base y las cuatro tablas
 
-Dentro de la instancia abre Bases de datos > Crear base de datos. Escribe automind y confirma. En Usuarios > Agregar cuenta crea el usuario de base de datos automind_app con una contraseña diferente a postgres. Guárdala: se almacenará como secreto en el paso 5.
+Dentro de la instancia abre Bases de datos > Crear base de datos. Escribe storeml_database y confirma. En Usuarios > Agregar cuenta crea el usuario de base de datos automind_app con una contraseña diferente a postgres. Guárdala: se almacenará como secreto en el paso 5.
 
-Abre Cloud SQL Studio en el menú de la instancia. Selecciona autenticación integrada de base de datos (Built-in), base automind, usuario postgres y su contraseña. Elige Nueva consulta. Abre localmente sql/01-esquema.sql, copia todo su contenido al editor y pulsa Ejecutar. Después ejecuta de la misma forma sql/02-catalogo-y-accesos.sql y, por último, sql/03-privilegios-app.sql.
+Abre Cloud SQL Studio en el menú de la instancia. Selecciona autenticación integrada de base de datos (Built-in), base storeml_database, usuario postgres y su contraseña. Elige Nueva consulta. Abre localmente sql/01-esquema.sql, copia todo su contenido al editor y pulsa Ejecutar. Después ejecuta de la misma forma sql/02-catalogo-y-accesos.sql y, por último, sql/03-privilegios-app.sql.
 
 El primer archivo crea las cuatro tablas con claves foráneas y restricciones. El segundo carga las 24 fichas con sus rutas y 12 permisos reservados para tu Gmail. No crea un usuario Google ficticio. El tercero limita automind_app: puede registrar identidades verificadas, gestionar solicitudes y cuota, pero no otorgar permisos ni editar el catálogo. No uses postgres como usuario de la API.
 
@@ -72,13 +74,13 @@ Deben aparecer modelos, permisos, solicitudes y usuarios. El contador de cuota s
 
 Abre Secret Manager > Crear secreto. Nombre: automind-db-password. Como valor escribe únicamente la contraseña de automind_app, sin comillas y sin salto de línea adicional. Guarda el secreto y anota la versión, por ejemplo 1.
 
-En los permisos de ese secreto agrega el email completo de automind-api@TU_PROYECTO.iam.gserviceaccount.com y el rol Secret Manager Secret Accessor (roles/secretmanager.secretAccessor). Limita el acceso al secreto necesario; el motor de calculadoras no necesita esta contraseña.
+En los permisos de ese secreto agrega el email completo de storeml-api@TU_PROYECTO.iam.gserviceaccount.com y el rol Secret Manager Secret Accessor (roles/secretmanager.secretAccessor). Limita el acceso al secreto necesario; el motor de calculadoras no necesita esta contraseña.
 
 La API utiliza estas variables públicas de configuración y un secreto:
 
 ```text
-INSTANCE_CONNECTION_NAME = PROYECTO:REGIÓN:automind-pg
-DB_NAME                  = automind
+INSTANCE_CONNECTION_NAME = PROYECTO:REGIÓN:storeml-pg
+DB_NAME                  = storeml_database
 DB_USER                  = automind_app
 GOOGLE_WEB_CLIENT_ID     = cliente Web OAuth real
 INFERENCE_URL            = URL HTTPS del motor privado
@@ -87,7 +89,7 @@ DB_PASSWORD              = referencia al secreto, versión 1
 
 DB_PASSWORD se configura en Cloud Run como Referencia a un secreto y Exponer como variable de entorno, no pegando la contraseña en el formulario de variables ordinarias. No va en GitHub, en mobile/src/config.ts ni en el PDF. La contraseña de postgres tampoco se utiliza en el contenedor.
 
-El conector oficial usa la identidad de ejecución automind-api y su rol Cloud SQL Client para acceder a la instancia. El usuario y contraseña PostgreSQL determinan qué operaciones SQL permite esa conexión. Son controles distintos y ambos deben estar configurados.
+El conector oficial usa la identidad de ejecución storeml-api y su rol Cloud SQL Client para acceder a la instancia. El usuario y contraseña PostgreSQL determinan qué operaciones SQL permite esa conexión. Son controles distintos y ambos deben estar configurados.
 
 La API mantiene como máximo cinco conexiones SQL por instancia de Cloud Run. Con máximo tres instancias habrá hasta quince conexiones de aplicación, además de las administrativas. El servidor valida la conexión al iniciar; un nombre de conexión, usuario o contraseña incorrecto puede impedir que la revisión arranque.
 ---
@@ -122,7 +124,7 @@ Si ya usabas triggers de Cloud Build para estos servicios, desactívalos desde C
 
 ## 8. Configurar OIDC / Workload Identity Federation
 
-En Google Cloud busca Workload Identity Federation dentro de IAM y administración. Crea un pool llamado GitHub, ID github, habilitado. Crea en él un proveedor OIDC con ID automind. Issuer URL: https://token.actions.githubusercontent.com. Conserva las audiencias predeterminadas; la acción utiliza el recurso completo del proveedor como audiencia.
+En Google Cloud busca Workload Identity Federation dentro de IAM y administración. Crea un pool llamado GitHub, ID github, habilitado. Crea en él un proveedor OIDC con ID storeml. Issuer URL: https://token.actions.githubusercontent.com. Conserva las audiencias predeterminadas; la acción utiliza el recurso completo del proveedor como audiencia.
 
 En el mapeo de atributos agrega estas parejas. La columna izquierda es el atributo Google y la derecha su valor:
 
@@ -144,34 +146,36 @@ assertion.ref == 'refs/heads/main' &&
  assertion.event_name == 'workflow_dispatch')
 ```
 
-Guarda. Copia el nombre completo del proveedor: projects/NUMERO_PROYECTO/locations/global/workloadIdentityPools/github/providers/automind. Usa el número del proyecto Google, no su ID de texto.
+Guarda. Copia el nombre completo del proveedor: projects/NUMERO_PROYECTO/locations/global/workloadIdentityPools/github/providers/storeml. Usa el número del proyecto Google, no su ID de texto.
 
-En el pool usa Otorgar acceso mediante una cuenta de servicio, selecciona automind-deploy y restringe las identidades a attribute.repository_id igual al REPOSITORY_ID. El permiso resultante es Workload Identity User (roles/iam.workloadIdentityUser) sobre automind-deploy.
+En el pool usa Otorgar acceso mediante una cuenta de servicio, selecciona storeml-deploy y restringe las identidades a attribute.repository_id igual al REPOSITORY_ID. El permiso resultante es Workload Identity User (roles/iam.workloadIdentityUser) sobre storeml-deploy.
 
 También puedes agregarlo en los permisos de esa cuenta con el principal: principalSet://iam.googleapis.com/projects/NUMERO_PROYECTO/locations/global/workloadIdentityPools/github/attribute.repository_id/REPOSITORY_ID. No concedas acceso al pool entero. El proveedor añade las restricciones de propietario, rama y evento indicadas arriba. La configuración puede tardar unos minutos en propagarse.
+
+Si aparece Configura tu aplicación y pide Ruta de acceso OIDC ID token, cierra únicamente ese formulario de descarga. El permiso guardado se conserva. GitHub Actions obtiene el token automáticamente mediante la acción auth; no necesita una ruta local de token ni descargar ADC manualmente. Verifica en Cuentas de servicio conectadas que aparezca storeml-deploy con el filtro repository_id del repositorio.
 ---
 
 ## 9. Artifact Registry y variables de GitHub
 
-En Google Cloud > Artifact Registry > Crear repositorio, usa nombre automind, formato Docker, modo Standard y región southamerica-west1 (o la región que elijas para los servicios). En los permisos de ese repositorio concede Artifact Registry Writer a automind-deploy. El repositorio debe existir antes del primer despliegue.
+En Google Cloud > Artifact Registry > Crear repositorio, usa nombre storeml, formato Docker, modo Standard y región southamerica-west1 (o la región que elijas para los servicios). En los permisos de ese repositorio concede Artifact Registry Writer a storeml-deploy. El repositorio debe existir antes del primer despliegue.
 
 En GitHub > repositorio > Settings > Secrets and variables > Actions > Variables, crea estas variables de repositorio. Son identificadores de configuración, no claves privadas:
 
 ```text
 GCP_PROJECT_ID               ID de texto del proyecto Google
 GCP_WIF_PROVIDER             Nombre completo del proveedor OIDC
-GCP_DEPLOY_SERVICE_ACCOUNT   Email de automind-deploy
-INSTANCE_CONNECTION_NAME    PROYECTO:REGIÓN:automind-pg
+GCP_DEPLOY_SERVICE_ACCOUNT   Email de storeml-deploy
+INSTANCE_CONNECTION_NAME    PROYECTO:REGIÓN:storeml-pg
 GOOGLE_WEB_CLIENT_ID         Cliente OAuth Web real
 GCP_REGION                  southamerica-west1
-ARTIFACT_REPOSITORY          automind
+ARTIFACT_REPOSITORY          storeml
 DB_PASSWORD_SECRET          automind-db-password
 DB_PASSWORD_SECRET_VERSION  1
 ```
 
 Las últimas cuatro tienen los valores predeterminados mostrados si las omites. Aun así, conviene definirlas explícitamente. Si tu secreto tiene otra versión numérica, usa esa versión. No uses latest ni pegues la contraseña SQL como variable o secreto de GitHub.
 
-Los servicios y usuarios tienen nombres fijos: automind-api, automind-inference, DB_NAME=automind, DB_USER=automind_app. Las cuentas de ejecución son automind-api@PROYECTO.iam.gserviceaccount.com y automind-inference@PROYECTO.iam.gserviceaccount.com. El validador exige que la instancia SQL y la cuenta de despliegue pertenezcan a GCP_PROJECT_ID.
+Los servicios y usuarios tienen nombres fijos: automind-api, automind-inference, DB_NAME=storeml_database, DB_USER=automind_app. Las cuentas de ejecución son storeml-api@PROYECTO.iam.gserviceaccount.com y storeml-inference@PROYECTO.iam.gserviceaccount.com. El validador exige que la instancia SQL y la cuenta de despliegue pertenezcan a GCP_PROJECT_ID.
 
 La contraseña permanece en Secret Manager según el paso 5. La API necesita acceso a ese secreto; GitHub solo pasa la referencia al configurar Cloud Run. Actions solicita un token Google temporal por OIDC después de compilar las imágenes; no requiere descargar una clave JSON.
 ---
@@ -184,7 +188,7 @@ El job desplegar comprueba que el commit sigue siendo el actual de main, compila
 
 El workflow configura INSTANCE_CONNECTION_NAME, DB_NAME, DB_USER, APP_ENV, GOOGLE_WEB_CLIENT_ID e INFERENCE_URL, y referencia DB_PASSWORD en Secret Manager. No ejecuta los scripts SQL sobre producción: las tablas y datos iniciales deben haberse creado con el paso 4.
 
-Al finalizar, abre Summary y copia las URLs de API y motor. En Cloud Run, revisa automind-inference: debe requerir autenticación. En sus permisos concede Cloud Run Invoker a automind-api@TU_PROYECTO.iam.gserviceaccount.com. No añadas allUsers al motor.
+Al finalizar, abre Summary y copia las URLs de API y motor. En Cloud Run, revisa automind-inference: debe requerir autenticación. En sus permisos concede Cloud Run Invoker a storeml-api@TU_PROYECTO.iam.gserviceaccount.com. No añadas allUsers al motor.
 
 En automind-api configura Permitir acceso público desde Seguridad/Autenticación. La API seguirá comprobando Google en cada ruta. Los servicios nuevos se crean privados por defecto; esta configuración manual se hace una sola vez. El workflow no cambia esas políticas IAM porque la cuenta de despliegue no tiene permisos para hacerlo.
 
@@ -193,7 +197,7 @@ Abre la URL de API seguida de /v1/catalog en el navegador: debe responder 401 de
 
 ## 11. Editar catálogo, accesos y solicitudes
 
-Administra datos desde Cloud SQL Studio, entrando a automind como postgres u otro administrador autorizado. No necesitas dar credenciales SQL a los usuarios móviles. Para revisar el catálogo y cambiar un texto:
+Administra datos desde Cloud SQL Studio, entrando a storeml_database como postgres u otro administrador autorizado. No necesitas dar credenciales SQL a los usuarios móviles. Para revisar el catálogo y cambiar un texto:
 
 ```sql
 SELECT id,nombre,area,archivo,activo FROM public.modelos ORDER BY id;
