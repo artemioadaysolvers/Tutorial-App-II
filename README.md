@@ -4,7 +4,7 @@ App Android/iOS con Google Gmail, Store, solicitudes y acceso por ID. Las 24 cal
 
 ## Una base y cuatro tablas
 
-La base PostgreSQL `automind` tiene exactamente cuatro tablas de aplicación en `public`:
+La base PostgreSQL `storeml_database` tiene exactamente cuatro tablas de aplicación en `public`:
 
 - `usuarios`: subject Google verificado, Gmail, fecha y contador de cuota.
 - `modelos`: ID, nombre, área, descripción, ruta `archivo` y estado activo.
@@ -26,17 +26,17 @@ No se utiliza Firestore ni Firebase. Los IDs de modelo son números, no strings,
 - `infra/`: validación de configuración de GitHub Actions y sus pruebas Python.
 - `docs/GUIA-GOOGLE-CLOUD.pdf` y `.md`: manual completo de creación por interfaz, Cloud SQL Studio, secretos, OAuth, despliegue, edición de datos y compilación.
 
-En Cloud SQL Studio, como administrador de `automind`, ejecuta los tres archivos SQL en orden después de crear el usuario `automind_app`. El manual contiene todos los pasos. Los archivos iniciales conservan cambios existentes y no vuelven a habilitar permisos revocados.
+En Cloud SQL Studio, como administrador de `storeml_database`, ejecuta los tres archivos SQL en orden después de crear el usuario `automind_app`. El manual contiene todos los pasos. Los archivos iniciales conservan cambios existentes y no vuelven a habilitar permisos revocados.
 
 ## GitHub Actions
 
 Cada push a `main` ejecuta las pruebas y, si pasan, compila y despliega API y motor en Cloud Run. Las pull requests solo ejecutan pruebas. Incluye la carpeta oculta `.github` al subir las fuentes a GitHub; el ZIP no se sube como un único archivo.
 
-Configura una vez Workload Identity Federation, la cuenta `automind-deploy`, sus permisos y las variables de repositorio siguiendo los pasos 7 a 10 del manual. Actions usa OIDC con tokens temporales; no necesita claves JSON ni la contraseña PostgreSQL en GitHub. Las acciones están fijadas a commits completos. La contraseña permanece en Secret Manager y la API utiliza su propia cuenta de ejecución.
+Configura una vez Workload Identity Federation, la cuenta `storeml-deploy`, sus permisos y las variables de repositorio siguiendo los pasos 7 a 10 del manual. Actions usa OIDC con tokens temporales; no necesita claves JSON ni la contraseña PostgreSQL en GitHub. Las acciones están fijadas a commits completos. La contraseña permanece en Secret Manager y la API utiliza su propia cuenta de ejecución.
 
 El flujo publica imágenes en Artifact Registry y despliega sus digests. Serializa despliegues y omite commits pendientes que ya no sean el actual de `main`. No modifica las cuatro tablas ni sus datos; los SQL iniciales se ejecutan manualmente. El acceso público de la API y la autorización de API al motor privado se configuran una vez en Cloud Run. La compilación y publicación móvil siguen los pasos Android/iOS del manual.
 
-Este paquete contiene la automatización preparada; no se ha vinculado ni ejecutado en tu repositorio o proyecto Google Cloud.
+La ejecución de GitHub Actions 41709403113 pasó las pruebas y se detuvo por variables Google Cloud ausentes. Las cuentas de ejecución ahora son storeml-api y storeml-inference; el despliegue utiliza storeml-deploy. Los servicios Cloud Run conservan los nombres automind-api y automind-inference. No se ha completado un despliegue real en Google Cloud.
 
 ## Rutas del repositorio privado
 
@@ -44,7 +44,7 @@ Ejemplo: ID `10000002`, `archivo = inference/modelos/inmobiliario/cart.py`, `MOD
 
 ## Conexión de producción
 
-Cuenta de servicio de API con Cloud SQL Client y acceso al secreto de su contraseña. Variables `INSTANCE_CONNECTION_NAME`, `DB_NAME=automind`, `DB_USER=automind_app`, `GOOGLE_WEB_CLIENT_ID`, `INFERENCE_URL`; `DB_PASSWORD` referenciado desde Secret Manager. No usar `postgres` como usuario de aplicación. El motor Python queda privado y separado de PostgreSQL.
+Cuenta de servicio de API con Cloud SQL Client y acceso al secreto de su contraseña. Variables `INSTANCE_CONNECTION_NAME`, `DB_NAME=storeml_database`, `DB_USER=automind_app`, `GOOGLE_WEB_CLIENT_ID`, `INFERENCE_URL`; `DB_PASSWORD` referenciado desde Secret Manager. No usar `postgres` como usuario de aplicación. El motor Python queda privado y separado de PostgreSQL.
 
 Para ejecutar la API usa `uvicorn automind_api.main:app --host 0.0.0.0 --port 8080` después de configurar las variables de conexión y OAuth. Para desarrollo puede usarse `DATABASE_URL=postgresql+pg8000://...` con `APP_ENV` distinto de production. En Cloud Run el conector oficial es obligatorio.
 
