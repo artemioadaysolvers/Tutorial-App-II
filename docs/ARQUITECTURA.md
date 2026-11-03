@@ -4,7 +4,7 @@
 flowchart LR
   APP[React Native + TypeScript] -->|ID token Google + ID numérico + inputs| API[API Python / FastAPI]
   API -->|Verificación de identidad| GOOGLE[Google]
-  API -->|Cloud SQL Connector + pg8000| SQL[(PostgreSQL automind)]
+  API -->|Cloud SQL Connector + pg8000| SQL[(PostgreSQL storeml_database)]
   API -->|Token IAM del servicio| PY[Cloud Run privado: sumas Python]
   SQL --- U[usuarios]
   SQL --- M[modelos]
@@ -35,6 +35,6 @@ El backend de API utiliza Python: automind_api/app.py (rutas), auth.py (google-a
 
 ## Despliegue
 
-GitHub Actions prueba cada push a main y las pull requests. Solo main puede desplegar, después de pasar las pruebas. Workload Identity Federation restringe la identidad al propietario y repositorio numéricos, rama main y eventos push/workflow_dispatch. La cuenta automind-deploy tiene permisos para publicar imágenes y desplegar con las dos cuentas de ejecución; no recibe la contraseña SQL ni permisos para cambiar las políticas IAM de los servicios.
+GitHub Actions prueba cada push a main y las pull requests. Solo main puede desplegar, después de pasar las pruebas. Workload Identity Federation restringe la identidad al propietario y repositorio numéricos, rama main y eventos push/workflow_dispatch. La cuenta storeml-deploy tiene permisos para publicar imágenes y desplegar con las dos cuentas de ejecución; no recibe la contraseña SQL ni permisos para cambiar las políticas IAM de los servicios.
 
-Las imágenes se compilan antes de solicitar credenciales temporales, se suben a Artifact Registry y se despliegan por digest. Motor y API se actualizan secuencialmente; no es una transacción atómica. El workflow conserva las políticas públicas/privadas configuradas una vez por el administrador. La API usa su cuenta automind-api para Secret Manager, Cloud SQL y la invocación del motor. Ningún SQL de producción se ejecuta desde Actions.
+Las imágenes se compilan antes de solicitar credenciales temporales, se suben a Artifact Registry y se despliegan por digest. Motor y API se actualizan secuencialmente; no es una transacción atómica. El workflow conserva las políticas públicas/privadas configuradas una vez por el administrador. La API usa su cuenta storeml-api para Secret Manager, Cloud SQL y la invocación del motor. Ningún SQL de producción se ejecuta desde Actions.
