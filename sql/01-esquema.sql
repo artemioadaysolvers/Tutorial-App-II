@@ -1,4 +1,4 @@
--- Ejecutar en la base automind desde Cloud SQL Studio como administrador.
+-- Ejecutar en la base storeml_database desde Cloud SQL Studio como administrador.
 -- Exactamente cuatro tablas de la aplicación. No crea usuarios Google ficticios.
 BEGIN;
 
