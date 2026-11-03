@@ -104,7 +104,7 @@ class PostgresTests(unittest.TestCase):
             raw.driver_connection.autocommit=True;cur=raw.cursor()
             cur.execute('SELECT current_database()');name=cur.fetchone()[0]
             self.assertTrue(name.replace('_','').isalnum())
-            cur.execute((ROOT/'sql/03-privilegios-app.sql').read_text('utf-8').replace('ON DATABASE automind',f'ON DATABASE "{name}"'))
+            cur.execute((ROOT/'sql/03-privilegios-app.sql').read_text('utf-8').replace('ON DATABASE storeml_database',f'ON DATABASE "{name}"'))
             cur.execute('SET ROLE automind_app');cur.close()
         finally:
             raw.driver_connection.autocommit=False
