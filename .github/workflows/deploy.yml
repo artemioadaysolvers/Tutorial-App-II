@@ -1,0 +1,162 @@
+name: AutoMind - pruebas y despliegue
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      solo_identidad:
+        description: Mostrar IDs del repositorio para la configuración inicial, sin desplegar
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  identidad:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Datos del repositorio para Workload Identity Federation
+        env:
+          REPO: ${{ github.repository }}
+          REPO_ID: ${{ github.repository_id }}
+          OWNER_ID: ${{ github.repository_owner_id }}
+        run: |
+          printf 'REPOSITORIO=%s\nREPOSITORY_ID=%s\nOWNER_ID=%s\n' "$REPO" "$REPO_ID" "$OWNER_ID"
+
+  pruebas:
+    if: ${{ !inputs.solo_identidad }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci-test-password
+          POSTGRES_DB: automind_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres -d automind_test"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: |
+            api/requirements.txt
+            api/requirements-test.txt
+      - name: Instalar dependencias Python de pruebas
+        run: python -m pip install -r api/requirements-test.txt
+      - name: Probar API e integración con PostgreSQL de CI
+        working-directory: api
+        env:
+          TEST_DATABASE_URL: postgresql+pg8000://postgres:ci-test-password@127.0.0.1:5432/automind_test
+        run: python -m unittest discover -s tests -v
+      - name: Probar los 24 archivos de calculadoras
+        working-directory: inference
+        run: python -m unittest test_models.py -v
+      - name: Probar validación de variables del despliegue
+        run: python -m unittest discover -s infra -p 'test_*.py' -v
+
+  desplegar:
+    needs: pruebas
+    if: ${{ !inputs.solo_identidad && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    concurrency:
+      group: automind-backend-produccion
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      GCP_REGION: ${{ vars.GCP_REGION || 'southamerica-west1' }}
+      GCP_WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER }}
+      GCP_DEPLOY_SERVICE_ACCOUNT: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+      ARTIFACT_REPOSITORY: ${{ vars.ARTIFACT_REPOSITORY || 'automind' }}
+      INSTANCE_CONNECTION_NAME: ${{ vars.INSTANCE_CONNECTION_NAME }}
+      GOOGLE_WEB_CLIENT_ID: ${{ vars.GOOGLE_WEB_CLIENT_ID }}
+      DB_PASSWORD_SECRET: ${{ vars.DB_PASSWORD_SECRET || 'automind-db-password' }}
+      DB_PASSWORD_SECRET_VERSION: ${{ vars.DB_PASSWORD_SECRET_VERSION || '1' }}
+    steps:
+      - name: Comprobar que el commit sigue siendo el actual de main
+        id: vigente
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          actual="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')"
+          if [ "$actual" = "$GITHUB_SHA" ]; then
+            echo 'actual=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'actual=false' >> "$GITHUB_OUTPUT"
+            echo 'Hay un commit posterior en main; se omite este despliegue antiguo.'
+          fi
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        if: steps.vigente.outputs.actual == 'true'
+        with:
+          persist-credentials: false
+      - name: Validar variables de despliegue
+        if: steps.vigente.outputs.actual == 'true'
+        run: python infra/github_config.py
+      - name: Compilar imágenes Docker
+        if: steps.vigente.outputs.actual == 'true'
+        run: |
+          base="$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$ARTIFACT_REPOSITORY"
+          docker build -t "$base/api:$GITHUB_SHA" api
+          docker build -t "$base/inference:$GITHUB_SHA" inference
+      - name: Autenticación temporal Google Cloud mediante OIDC
+        if: steps.vigente.outputs.actual == 'true'
+        id: auth
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+          token_format: access_token
+          access_token_lifetime: 3600s
+          create_credentials_file: false
+          export_environment_variables: false
+      - name: Instalar Google Cloud CLI
+        if: steps.vigente.outputs.actual == 'true'
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3
+        env:
+          CLOUDSDK_AUTH_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+      - name: Publicar imágenes y desplegar ambos servicios
+        if: steps.vigente.outputs.actual == 'true'
+        env:
+          CLOUDSDK_AUTH_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
+        run: |
+          printf '%s' "$CLOUDSDK_AUTH_ACCESS_TOKEN" | docker login -u oauth2accesstoken --password-stdin "https://$GCP_REGION-docker.pkg.dev"
+          base="$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$ARTIFACT_REPOSITORY"
+          docker push "$base/inference:$GITHUB_SHA"
+          docker push "$base/api:$GITHUB_SHA"
+          export INFERENCE_IMAGE
+          export API_IMAGE
+          INFERENCE_IMAGE="$(docker inspect --format '{{index .RepoDigests 0}}' "$base/inference:$GITHUB_SHA")"
+          API_IMAGE="$(docker inspect --format '{{index .RepoDigests 0}}' "$base/api:$GITHUB_SHA")"
+          gcloud run deploy automind-inference --project "$GCP_PROJECT_ID" --region "$GCP_REGION" \
+            --image "$INFERENCE_IMAGE" --service-account "automind-inference@$GCP_PROJECT_ID.iam.gserviceaccount.com" \
+            --port 8080 --cpu 1 --memory 512Mi --min-instances 0 --max-instances 3 \
+            --concurrency 4 --timeout 60 --ingress all --quiet
+          export INFERENCE_URL
+          INFERENCE_URL="$(gcloud run services describe automind-inference --project "$GCP_PROJECT_ID" --region "$GCP_REGION" --format='value(status.url)')"
+          python infra/github_config.py --env-file "$RUNNER_TEMP/api-env.json"
+          gcloud run deploy automind-api --project "$GCP_PROJECT_ID" --region "$GCP_REGION" \
+            --image "$API_IMAGE" --service-account "automind-api@$GCP_PROJECT_ID.iam.gserviceaccount.com" \
+            --port 8080 --cpu 1 --memory 512Mi --min-instances 0 --max-instances 3 \
+            --concurrency 40 --timeout 65 --ingress all --env-vars-file "$RUNNER_TEMP/api-env.json" \
+            --set-secrets "DB_PASSWORD=$DB_PASSWORD_SECRET:$DB_PASSWORD_SECRET_VERSION" --quiet
+          url="$(gcloud run services describe automind-api --project "$GCP_PROJECT_ID" --region "$GCP_REGION" --format='value(status.url)')"
+          printf '## Despliegue del backend\n\nCommit: `%s`\n\nAPI: %s\n\nMotor privado: %s\n' "$GITHUB_SHA" "$url" "$INFERENCE_URL" >> "$GITHUB_STEP_SUMMARY"

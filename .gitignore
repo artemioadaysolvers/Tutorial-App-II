@@ -12,3 +12,4 @@
 **/*.keystore
 !mobile/android/app/debug.keystore
 **/*.log
+gha-creds-*.json

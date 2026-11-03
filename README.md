@@ -22,9 +22,21 @@ No se utiliza Firestore ni Firebase. Los IDs de modelo son números, no strings,
 - `inference/modelos/<área>/<modelo>.py`: los 24 archivos Python independientes.
 - `inference/registry.py`: lista fija de IDs y módulos permitidos.
 - `mobile/`: React Native con proyectos Android e iOS.
+- `.github/workflows/deploy.yml`: pruebas y despliegue automático del backend desde `main`.
+- `infra/`: validación de configuración de GitHub Actions y sus pruebas Python.
 - `docs/GUIA-GOOGLE-CLOUD.pdf` y `.md`: manual completo de creación por interfaz, Cloud SQL Studio, secretos, OAuth, despliegue, edición de datos y compilación.
 
 En Cloud SQL Studio, como administrador de `automind`, ejecuta los tres archivos SQL en orden después de crear el usuario `automind_app`. El manual contiene todos los pasos. Los archivos iniciales conservan cambios existentes y no vuelven a habilitar permisos revocados.
+
+## GitHub Actions
+
+Cada push a `main` ejecuta las pruebas y, si pasan, compila y despliega API y motor en Cloud Run. Las pull requests solo ejecutan pruebas. Incluye la carpeta oculta `.github` al subir las fuentes a GitHub; el ZIP no se sube como un único archivo.
+
+Configura una vez Workload Identity Federation, la cuenta `automind-deploy`, sus permisos y las variables de repositorio siguiendo los pasos 7 a 10 del manual. Actions usa OIDC con tokens temporales; no necesita claves JSON ni la contraseña PostgreSQL en GitHub. Las acciones están fijadas a commits completos. La contraseña permanece en Secret Manager y la API utiliza su propia cuenta de ejecución.
+
+El flujo publica imágenes en Artifact Registry y despliega sus digests. Serializa despliegues y omite commits pendientes que ya no sean el actual de `main`. No modifica las cuatro tablas ni sus datos; los SQL iniciales se ejecutan manualmente. El acceso público de la API y la autorización de API al motor privado se configuran una vez en Cloud Run. La compilación y publicación móvil siguen los pasos Android/iOS del manual.
+
+Este paquete contiene la automatización preparada; no se ha vinculado ni ejecutado en tu repositorio o proyecto Google Cloud.
 
 ## Rutas del repositorio privado
 

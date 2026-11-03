@@ -32,3 +32,9 @@ El catálogo muestra metadatos. El motor selecciona código mediante un registro
 El rol PostgreSQL de la API solo tiene SELECT, INSERT de usuarios/solicitudes y UPDATE de columnas concretas. La edición de catálogo y concesión de permisos se realiza administrativamente en Cloud SQL Studio.
 
 El backend de API utiliza Python: automind_api/app.py (rutas), auth.py (google-auth), repository.py (SQLAlchemy), database.py (Cloud SQL Python Connector) y predictor.py (llamada IAM al motor Python privado). Los dos contenedores ejecutan Python; TypeScript solo permanece en mobile.
+
+## Despliegue
+
+GitHub Actions prueba cada push a main y las pull requests. Solo main puede desplegar, después de pasar las pruebas. Workload Identity Federation restringe la identidad al propietario y repositorio numéricos, rama main y eventos push/workflow_dispatch. La cuenta automind-deploy tiene permisos para publicar imágenes y desplegar con las dos cuentas de ejecución; no recibe la contraseña SQL ni permisos para cambiar las políticas IAM de los servicios.
+
+Las imágenes se compilan antes de solicitar credenciales temporales, se suben a Artifact Registry y se despliegan por digest. Motor y API se actualizan secuencialmente; no es una transacción atómica. El workflow conserva las políticas públicas/privadas configuradas una vez por el administrador. La API usa su cuenta automind-api para Secret Manager, Cloud SQL y la invocación del motor. Ningún SQL de producción se ejecuta desde Actions.
