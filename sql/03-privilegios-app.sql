@@ -1,5 +1,5 @@
 -- Crear primero el usuario PostgreSQL storeml_app desde la interfaz de Cloud SQL.
--- Ejecutar este archivo como postgres en la base automind.
+-- Ejecutar este archivo como postgres en la base storeml_database.
 BEGIN;
 DO $$ BEGIN
   IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'cloudsqlsuperuser') THEN
